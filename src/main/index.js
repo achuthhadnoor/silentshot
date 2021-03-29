@@ -4,13 +4,14 @@ import { app, BrowserWindow, Tray } from 'electron'
 import * as path from 'path'
 import { format as formatUrl } from 'url'
 import screenshot from 'screenshot-desktop'
-
+import {homedir} from 'os'  
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow
 let _tray;
-let format = 'png';
+let format = 'jpg';
+let _home = homedir();  
 function createMainWindow() {
   const window = new BrowserWindow({webPreferences: {nodeIntegration: true}})
 
@@ -48,12 +49,11 @@ function createTray(){
   _tray = new Tray(appIcon);
   _tray.setTitle('SilentShot | click to capture');
   _tray.on('click',()=>{
-    screenshot({format:format}).then((img) => {
-       console.log("img: Buffer filled with jpg goodness")
-      // ...
-    }).catch((err) => {
-      // ...
-    })
+    let filename = `${homedir}/Downloads/capture${Date.now()}.${format}`;
+    screenshot({filename});
+  })
+  _tray.on('right-click',()=>{
+    // create context menu 
   })
 }
 
