@@ -8,6 +8,11 @@
     "dist": "npm run compile && electron-builder",
     "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
   },
+  "build":{
+    "files":[
+      "assets"
+    ]
+  },
   "dependencies": {
     "screenshot-desktop": "^1.12.3",
     "source-map-support": "^0.5.16"
@@ -17,5 +22,8 @@
     "electron-builder": "^22.4.1",
     "electron-webpack": "^2.8.2",
     "webpack": "~4.42.1"
+  },
+  "electronWebpack":{
+    "staticSourceDirectory": "src/static"
   }
 }

@@ -4,9 +4,10 @@
 > create a new directory in pictures by default or ask user for default path on onboarding so they can change later
 
 ```bash
-* copy image to clipboard
+* toggle copy image to clipboard / save
 * image format 
 * output directory
+* share to apps ( toggle )
 * Entire screen / screenshot of all the screens 
 * website to see the product 
 * affliate page to generate coupon discount 
