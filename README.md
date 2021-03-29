@@ -4,6 +4,7 @@
 > create a new directory in pictures by default or ask user for default path on onboarding so they can change later
 
 ```bash
+* copy image to clipboard
 * image format 
 * output directory
 * Entire screen / screenshot of all the screens 
