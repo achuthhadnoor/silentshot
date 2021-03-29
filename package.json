@@ -1,29 +1,30 @@
 {
   "name": "silentshot",
-  "version": "0.0.1",
-  "license": "MIT",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
   "scripts": {
-    "dev": "electron-webpack dev",
-    "compile": "electron-webpack",
-    "dist": "npm run compile && electron-builder",
-    "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
+    "start": "electron .",
+    "dev": "nodemon --watch main.js --exec 'electron .'"
   },
-  "build":{
-    "files":[
-      "assets"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achuthhadnoor/silentshot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/achuthhadnoor/silentshot/issues"
+  },
+  "homepage": "https://github.com/achuthhadnoor/silentshot#readme",
+  "devDependencies": {
+    "electron": "^12.0.2",
+    "electron-builder": "^22.10.5",
+    "electron-store": "^7.0.2",
+    "nodemon": "^2.0.7"
   },
   "dependencies": {
-    "screenshot-desktop": "^1.12.3",
-    "source-map-support": "^0.5.16"
-  },
-  "devDependencies": {
-    "electron": "8.2.0",
-    "electron-builder": "^22.4.1",
-    "electron-webpack": "^2.8.2",
-    "webpack": "~4.42.1"
-  },
-  "electronWebpack":{
-    "staticSourceDirectory": "src/static"
+    "screenshot-desktop": "^1.12.3"
   }
 }
