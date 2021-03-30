@@ -1,14 +1,18 @@
 'use strict'
 
-const { app, Tray, clipboard, Menu } = require("electron");
+const { app, Tray, clipboard, Menu, dialog } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');
 let _tray;
-let format = 'jpg';
+let settings = {
+  format: 'png',
+  defaultDir: homedir,
+  savetoClipboard: true,
+  saveToDevice: true,
+}
 let saveToFolder = true;
 let copyToClipBoard = true;
-
 if (app.dock) app.dock.hide();
 
 function createTray() {
@@ -16,11 +20,21 @@ function createTray() {
   _tray = new Tray(appIcon);
   _tray.setToolTip('SilentShot | click to capture');
   _tray.on('click', () => {
-    let filename = `${homedir}/Downloads/capture${Date.now()}.${format}`;
-    screenshot({ filename }).then(img => {
-      console.log('copied to clipboard');
-      clipboard.writeImage(img);
-    });
+    let filename = `${settings.defaultDir}/Downloads/capture${Date.now()}.${settings.format}`;
+    if (settings.saveToFolder) {
+      screenshot({ filename }).then(img => {
+        console.log('Copied to clipboard and saved to device!');
+        if (settings.copyToClipBoard) {
+          clipboard.writeImage(img);
+        };
+      });
+    }
+    else {
+      screenshot().then(img => {
+        console.log('Copied to clipboard');
+        clipboard.writeImage(img);
+      });
+    }
   })
   _tray.on('right-click', () => {
     // create context menu
@@ -32,6 +46,7 @@ function createTray() {
         type: "checkbox",
         click: () => {
           saveToFolder = saveToFolder ? false : true;
+          if (!copyToClipBoard) copyToClipBoard = true;
         },
         checked: saveToFolder,
       }, {
@@ -43,6 +58,19 @@ function createTray() {
         },
         checked: copyToClipBoard,
       }],
+    }, {
+      label: "change default directory",
+      click: () => {
+        dialog.showOpenDialog({
+          properties: ['openDirectory']
+        }).then(filepath => {
+          settings.defaultDir = filepath.filePaths[0];
+        })
+      }
+    },
+    {
+      label: "About Silentshot",
+      click: () => { shell.openExternal('https://silentshot.achuth.dev') }
     },
     {
       role: 'quit',
