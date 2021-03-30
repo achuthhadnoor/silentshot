@@ -1,19 +1,22 @@
 'use strict'
 
-const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow } = require("electron");
+const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow, ipcMain } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');
 const { onFirstRunMaybe } = require("./first-run");
 const Store = require("electron-store");
-let _store = new Store();
+let store = new Store();
 let _tray;
+let browserWindow;
+let user={
+  isVerified:false
+};
 let settings = {
   format: 'png',
   defaultDir: homedir,
   savetoClipboard: true,
-  saveToDevice: true,
-  isVerified:false,
+  saveToDevice: true, 
 } 
 
 if (store.get('user-info')) {
@@ -98,7 +101,7 @@ function createTray() {
 
 function createBrowserWindow (){
   browserWindow = new BrowserWindow({
-    icon: path.join('./static/icon.png'),
+    icon: join('./static/icon.png'),
     frame: false,
     height: 300,
     width: 300,
@@ -106,7 +109,8 @@ function createBrowserWindow (){
     alwaysOnTop: true,
     skipTaskbar: true,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      contextIsolation: false,
     }
   })
   browserWindow.loadFile('./static/index.html')
@@ -114,7 +118,7 @@ function createBrowserWindow (){
 
 app.on('ready', async() => {
   await onFirstRunMaybe();
-  if(settings.isVerified){
+  if(user.isVerified){
     return;
   }
   if (user.isVerified) {
@@ -129,4 +133,20 @@ app.on('ready', async() => {
     return;
   }
   createBrowserWindow();
+})
+
+
+ipcMain.on('verified', (event, { id, name }) => {
+  event.returnValue = "Verified";
+  user.id = id;
+  user.name = name;
+  user.isVerified = true;
+  store.set('user-info', user);
+  browserWindow.hide(); 
+  createTray();
+})
+
+
+ipcMain.on('quit', () => {
+  app.quit()
 })
