@@ -3,12 +3,19 @@
 
 <head>
     <style>
-        .wrapper {
+        body{
+            padding:0;
+            margin:0;
+            padding-bottom: 20px;
+        }
+        .wrapper { 
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #101010;
             color: #eee;
+            border-radius:10px;
+            background: #101010;
+            height: 90vh;
             font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
         }
 
@@ -76,7 +83,9 @@
     </style>
 </head>
 
-<body class="wrapper">
+<body>
+    <div class="wrapper">
+        
     <div class="flex">
         <span style="flex:1">Lapse</span>
         <i style="padding: 10px;cursor:pointer" id="quit-app" title="Quit">
@@ -96,8 +105,8 @@
         <input class="key" type="text" placeholder="Enter licenceKey" id="licence" required />
         <button type="submit" id="submit">Validate licence</button>
     </form>
-
     <i class="error"></i>
+    </div>
     <script defer src="../renderer.js"></script>
 </body>
 

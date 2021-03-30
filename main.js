@@ -6,6 +6,13 @@ const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');
 const { onFirstRunMaybe } = require("./first-run");
 const Store = require("electron-store");
+const AutoLaunch = require("auto-launch");
+
+const autoLauncher = new AutoLaunch({
+  name: "Lapse",
+  path: '/Applications/lapse.app',
+});
+
 let store = new Store();
 let _tray;
 let browserWindow;
@@ -108,6 +115,10 @@ function createBrowserWindow (){
     resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
+    transparent:true,
+    maximizable:false,
+    minimizable:false,
+    hasShadow:false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
