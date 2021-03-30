@@ -1,6 +1,6 @@
 'use strict'
 
-const { app, Tray, clipboard, Menu, dialog } = require("electron");
+const { app, Tray, clipboard, Menu, dialog, shell } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');

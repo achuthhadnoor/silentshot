@@ -1,28 +1,70 @@
 {
   "name": "silentshot",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Capture screenshots in background and to clipboard on single click",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "nodemon --watch main.js --exec 'electron .'"
+    "dist": "electron-builder -mwl"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/achuthhadnoor/silentshot.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "uiuxdx contact.uiuxdx@gmail.com",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/achuthhadnoor/silentshot/issues"
   },
   "homepage": "https://github.com/achuthhadnoor/silentshot#readme",
+  "build": {
+    "appId": "silentshot.uiuxdx.app",
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "artifactName": "${productName}-${version}-${os}.${ext}",
+      "icon": "static/icon.icns",
+      "category": "public.app-category.developer-tools",
+      "identity": "Lapse, Inc.",
+      "gatekeeperAssess": false,
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "entitlements": "./entitlements/entitlements.mac.plist",
+      "entitlementsInherit": "./entitlements/entitlements.mac.plist",
+      "publish": [
+        "github"
+      ]
+    },
+    "dmg": {
+      "icon": "static/icon.icns",
+      "sign": true
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "static/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Development",
+      "maintainer": "Instatus"
+    },
+    "afterSign": "scripts/notarize.js"
+  },
   "devDependencies": {
     "electron": "^12.0.2",
     "electron-builder": "^22.10.5",
     "electron-store": "^7.0.2",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "electron-notarize": "^1.0.0"
   },
   "dependencies": {
     "screenshot-desktop": "^1.12.3"
