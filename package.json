@@ -20,6 +20,11 @@
   "homepage": "https://github.com/achuthhadnoor/silentshot#readme",
   "build": {
     "appId": "silentshot.uiuxdx.app",
+    "files": [
+      "assets/**/*",
+      "main.js",
+      "first-run.js"
+    ],
     "mac": {
       "target": [
         "dmg",

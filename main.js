@@ -4,6 +4,7 @@ const { app, Tray, clipboard, Menu, dialog, shell } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');
+const { onFirstRunMaybe } = require("./first-run");
 let _tray;
 let settings = {
   format: 'png',
@@ -81,6 +82,7 @@ function createTray() {
   })
 }
 
-app.on('ready', () => {
+app.on('ready', async() => {
+  await onFirstRunMaybe();
   createTray();
 })
