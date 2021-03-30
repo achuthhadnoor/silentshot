@@ -34,10 +34,7 @@ if (store.get('silentshot')) {
 }
 else {
   store.set('silentshot', settings);
-}
-
-let saveToFolder = true;
-let copyToClipBoard = true;
+} 
 if (app.dock) app.dock.hide();
 
 function UpdateSettings(newSettings) {
@@ -49,6 +46,10 @@ function UpdateSettings(newSettings) {
   }
   settings = newSettings;
   store.set('silentshot', newSettings);
+}
+
+function createGlobalshortcuts(){
+
 }
 
 function createTray() {
@@ -81,18 +82,19 @@ function createTray() {
         label: 'Save to folder',
         type: "checkbox",
         click: () => {
-          saveToFolder = saveToFolder ? false : true;
-          if (!copyToClipBoard) copyToClipBoard = true;
+          settings.saveToDevice = settings.saveToDevice ? false : true;
+          if (!settings.savetoClipboard) settings.savetoClipboard = true;
+          UpdateSettings(settings);
         },
-        checked: saveToFolder,
+        checked: settings.saveToDevice,
       }, {
         label: 'Copy to clipboard',
         type: "checkbox",
         click: () => {
-          copyToClipBoard = copyToClipBoard ? false : true;
-          console.log(copyToClipBoard);
+          settings.savetoClipboard = settings.savetoClipboard ? false : true;
+          UpdateSettings(settings);
         },
-        checked: copyToClipBoard,
+        checked: settings.savetoClipboard,
       }],
     }, {
       label: "change default directory",
@@ -101,6 +103,7 @@ function createTray() {
           properties: ['openDirectory']
         }).then(filepath => {
           settings.defaultDir = filepath.filePaths[0];
+          UpdateSettings(settings);
         })
       }
     },
