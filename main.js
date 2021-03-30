@@ -1,6 +1,6 @@
 'use strict'
 
-const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow, ipcMain } = require("electron");
+const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');
@@ -34,7 +34,7 @@ if (store.get('silentshot')) {
 }
 else {
   store.set('silentshot', settings);
-} 
+}
 if (app.dock) app.dock.hide();
 
 function UpdateSettings(newSettings) {
@@ -48,31 +48,37 @@ function UpdateSettings(newSettings) {
   store.set('silentshot', newSettings);
 }
 
-function createGlobalshortcuts(){
+function createGlobalshortcuts() {
+  const ret = globalShortcut.register('Command+Alt+S', clickTray)
 
+  if (!ret) {
+    console.log('registration failed')
+  }
+  // Check whether a shortcut is registered.
+  console.log(globalShortcut.isRegistered('Command+Alt+S'))
 }
-
+function clickTray() {
+  let filename = `${settings.defaultDir}/Downloads/capture${Date.now()}.${settings.format}`;
+  if (settings.saveToFolder) {
+    screenshot({ filename }).then(img => {
+      console.log('Copied to clipboard and saved to device!');
+      if (settings.copyToClipBoard) {
+        clipboard.writeImage(img);
+      };
+    });
+  }
+  else {
+    screenshot().then(img => {
+      console.log('Copied to clipboard');
+      clipboard.writeImage(img);
+    });
+  }
+}
 function createTray() {
   const appIcon = join(__dirname, "static/light.png");
   _tray = new Tray(appIcon);
   _tray.setToolTip('SilentShot | click to capture');
-  _tray.on('click', () => {
-    let filename = `${settings.defaultDir}/Downloads/capture${Date.now()}.${settings.format}`;
-    if (settings.saveToFolder) {
-      screenshot({ filename }).then(img => {
-        console.log('Copied to clipboard and saved to device!');
-        if (settings.copyToClipBoard) {
-          clipboard.writeImage(img);
-        };
-      });
-    }
-    else {
-      screenshot().then(img => {
-        console.log('Copied to clipboard');
-        clipboard.writeImage(img);
-      });
-    }
-  })
+  _tray.on('click', clickTray)
   _tray.on('right-click', () => {
     // create context menu
     const contextMenu = [{
@@ -166,6 +172,9 @@ app.on('ready', async () => {
   createBrowserWindow();
 })
 
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll()
+})
 
 ipcMain.on('verified', (event, { id, name }) => {
   event.returnValue = "Verified";
