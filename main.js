@@ -1,17 +1,31 @@
 'use strict'
 
-const { app, Tray, clipboard, Menu, dialog, shell } = require("electron");
+const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir } = require('os');
 const { onFirstRunMaybe } = require("./first-run");
+const Store = require("electron-store");
+let _store = new Store();
 let _tray;
 let settings = {
   format: 'png',
   defaultDir: homedir,
   savetoClipboard: true,
   saveToDevice: true,
+  isVerified:false,
+} 
+
+if (store.get('user-info')) {
+  user = store.get('user-info');
 }
+if (store.get('silentshot')) {
+  settings = store.get('silentshot'); 
+}
+else {
+  store.set('silentshot', settings);
+}
+
 let saveToFolder = true;
 let copyToClipBoard = true;
 if (app.dock) app.dock.hide();
@@ -82,7 +96,37 @@ function createTray() {
   })
 }
 
+function createBrowserWindow (){
+  browserWindow = new BrowserWindow({
+    icon: path.join('./static/icon.png'),
+    frame: false,
+    height: 300,
+    width: 300,
+    resizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+  browserWindow.loadFile('./static/index.html')
+}
+
 app.on('ready', async() => {
   await onFirstRunMaybe();
-  createTray();
+  if(settings.isVerified){
+    return;
+  }
+  if (user.isVerified) {
+    if (settings.autolaunch) {
+      autoLauncher.enable();
+    }
+    else {
+      autoLauncher.disable();
+    }
+    createTray();
+    createGlobalshortcuts();
+    return;
+  }
+  createBrowserWindow();
 })

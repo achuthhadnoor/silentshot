@@ -23,7 +23,8 @@
     "files": [
       "assets/**/*",
       "main.js",
-      "first-run.js"
+      "first-run.js",
+      "renderer.js"
     ],
     "mac": {
       "target": [
