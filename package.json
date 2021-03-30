@@ -61,7 +61,7 @@
         "deb"
       ],
       "category": "Development",
-      "maintainer": "Instatus"
+      "maintainer": "Uiuxdx"
     },
     "afterSign": "scripts/notarize.js"
   },
