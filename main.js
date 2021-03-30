@@ -16,21 +16,21 @@ const autoLauncher = new AutoLaunch({
 let store = new Store();
 let _tray;
 let browserWindow;
-let user={
-  isVerified:false
+let user = {
+  isVerified: false
 };
 let settings = {
   format: 'png',
   defaultDir: homedir,
   savetoClipboard: true,
-  saveToDevice: true, 
-} 
+  saveToDevice: true,
+}
 
 if (store.get('user-info')) {
   user = store.get('user-info');
 }
 if (store.get('silentshot')) {
-  settings = store.get('silentshot'); 
+  settings = store.get('silentshot');
 }
 else {
   store.set('silentshot', settings);
@@ -39,6 +39,17 @@ else {
 let saveToFolder = true;
 let copyToClipBoard = true;
 if (app.dock) app.dock.hide();
+
+function UpdateSettings(newSettings) {
+  if (newSettings.autolaunch) {
+    autoLauncher.enable();
+  }
+  else {
+    autoLauncher.disable();
+  }
+  settings = newSettings;
+  store.set('silentshot', newSettings);
+}
 
 function createTray() {
   const appIcon = join(__dirname, "static/light.png");
@@ -94,6 +105,12 @@ function createTray() {
       }
     },
     {
+      label: 'Auto',
+      type: 'checkbox',
+      click: () => { settings.quality = 25; UpdateSettings(settings) },
+      checked: settings.quality === 25 ? true : false,
+    },
+    {
       label: "About Silentshot",
       click: () => { shell.openExternal('https://silentshot.achuth.dev') }
     },
@@ -106,7 +123,7 @@ function createTray() {
   })
 }
 
-function createBrowserWindow (){
+function createBrowserWindow() {
   browserWindow = new BrowserWindow({
     icon: join('./static/icon.png'),
     frame: false,
@@ -115,10 +132,10 @@ function createBrowserWindow (){
     resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
-    transparent:true,
-    maximizable:false,
-    minimizable:false,
-    hasShadow:false,
+    transparent: true,
+    maximizable: false,
+    minimizable: false,
+    hasShadow: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -127,9 +144,9 @@ function createBrowserWindow (){
   browserWindow.loadFile('./static/index.html')
 }
 
-app.on('ready', async() => {
+app.on('ready', async () => {
   await onFirstRunMaybe();
-  if(user.isVerified){
+  if (user.isVerified) {
     return;
   }
   if (user.isVerified) {
@@ -153,7 +170,7 @@ ipcMain.on('verified', (event, { id, name }) => {
   user.name = name;
   user.isVerified = true;
   store.set('user-info', user);
-  browserWindow.hide(); 
+  browserWindow.hide();
   createTray();
 })
 
