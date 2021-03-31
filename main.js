@@ -21,7 +21,7 @@ let user = {
 };
 let settings = {
   format: 'png',
-  defaultDir: homedir,
+  defaultDir: homedir(),
   savetoClipboard: true,
   saveToDevice: true,
 }
@@ -59,18 +59,18 @@ function createGlobalshortcuts() {
 }
 function clickTray() {
   let filename = `${settings.defaultDir}/Downloads/capture${Date.now()}.${settings.format}`;
-  if (settings.saveToFolder) {
+  if (settings.saveToDevice) {
     screenshot({ filename }).then(img => {
       console.log('Copied to clipboard and saved to device!');
-      if (settings.copyToClipBoard) {
+      if (settings.savetoClipboard) {
+        console.log(img);
         clipboard.writeImage(img);
       };
     });
   }
   else {
-    screenshot().then(img => {
-      console.log('Copied to clipboard');
-      clipboard.writeImage(img);
+    screenshot().then(img => { 
+        clipboard.writeImage(img); 
     });
   }
 }
@@ -97,6 +97,7 @@ function createTray() {
         label: 'Copy to clipboard',
         type: "checkbox",
         click: () => {
+          if(!settings.saveToDevice) settings.saveToDevice = true;
           settings.savetoClipboard = settings.savetoClipboard ? false : true;
           UpdateSettings(settings);
         },
@@ -154,22 +155,22 @@ function createBrowserWindow() {
 }
 
 app.on('ready', async () => {
-  await onFirstRunMaybe();
-  if (user.isVerified) {
-    return;
-  }
-  if (user.isVerified) {
-    if (settings.autolaunch) {
-      autoLauncher.enable();
-    }
-    else {
-      autoLauncher.disable();
-    }
+  // await onFirstRunMaybe();
+  // if (user.isVerified) {
+  //   return;
+  // }
+  // if (user.isVerified) {
+  //   if (settings.autolaunch) {
+  //     autoLauncher.enable();
+  //   }
+  //   else {
+  //     autoLauncher.disable();
+  //   }
     createTray();
-    createGlobalshortcuts();
-    return;
-  }
-  createBrowserWindow();
+  //   createGlobalshortcuts();
+  //   return;
+  // }
+  // createBrowserWindow();
 })
 
 app.on('will-quit', () => {
