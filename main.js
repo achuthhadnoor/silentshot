@@ -21,7 +21,7 @@ let user = {
 };
 let settings = {
   format: 'png',
-  defaultDir: homedir(),
+  defaultDir: `${homedir()}/Downloads`,
   savetoClipboard: true,
   saveToDevice: true,
 }
@@ -58,7 +58,7 @@ function createGlobalshortcuts() {
   console.log(globalShortcut.isRegistered('Command+Alt+S'))
 }
 function clickTray() {
-  let filename = `${settings.defaultDir}/Downloads/capture${Date.now()}.${settings.format}`;
+  let filename = `${settings.defaultDir}/capture${Date.now()}.${settings.format}`;
   if (settings.saveToDevice) {
     screenshot({ filename }).then(img => {
       console.log('Copied to clipboard and saved to device!');
@@ -155,22 +155,22 @@ function createBrowserWindow() {
 }
 
 app.on('ready', async () => {
-  // await onFirstRunMaybe();
-  // if (user.isVerified) {
-  //   return;
-  // }
-  // if (user.isVerified) {
-  //   if (settings.autolaunch) {
-  //     autoLauncher.enable();
-  //   }
-  //   else {
-  //     autoLauncher.disable();
-  //   }
+  await onFirstRunMaybe();
+  if (!user.isVerified) {
+    createBrowserWindow();
+    return;
+  }
+  if (user.isVerified) {
+    if (settings.autolaunch) {
+      autoLauncher.enable();
+    }
+    else {
+      autoLauncher.disable();
+    }
     createTray();
-  //   createGlobalshortcuts();
-  //   return;
-  // }
-  // createBrowserWindow();
+    createGlobalshortcuts();
+    return;
+  }
 })
 
 app.on('will-quit', () => {

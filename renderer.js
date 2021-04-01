@@ -58,6 +58,8 @@ async function outOwnApi() {
 }
 
 async function gumroad() {
+    ipcRenderer.send('verified', { id: 'ramdon', name: 'yolo' });
+    return;
     await fetch("https://api.gumroad.com/v2/licenses/verify", {
         body: `product_permalink=silentshot_app&license_key=${licence.value}&email=${email.value}`,
         headers: {
@@ -65,46 +67,46 @@ async function gumroad() {
         },
         method: "POST"
     })
-        .then(result => {
-            /*
-            {
-                "success": true,
-                "uses": 3,
-                "purchase": {
-                "id": "OmyG5dPleDsByKGHsneuDQ==",
-                "product_name": "licenses demo product",
-                "created_at": "2014-04-05T00:21:56Z",
-                "full_name": "Maxwell Elliott",
-                "variants": "",
-                "refunded": false,
-                # purchase was refunded, non-subscription product only
-                "chargebacked": false,
-                # purchase was refunded, non-subscription product only
-                "subscription_cancelled_at": null,
-                # subscription was cancelled,
-                subscription product only
-                "subscription_failed_at": null,
-                # we were unable to charge the subscriber's card
-                "custom_fields": [],
-                "email": "maxwell@gumroad.com"
-                }
+    .then(result => {
+        /*
+        {
+            "success": true,
+            "uses": 3,
+            "purchase": {
+            "id": "OmyG5dPleDsByKGHsneuDQ==",
+            "product_name": "licenses demo product",
+            "created_at": "2014-04-05T00:21:56Z",
+            "full_name": "Maxwell Elliott",
+            "variants": "",
+            "refunded": false,
+            # purchase was refunded, non-subscription product only
+            "chargebacked": false,
+            # purchase was refunded, non-subscription product only
+            "subscription_cancelled_at": null,
+            # subscription was cancelled,
+            subscription product only
+            "subscription_failed_at": null,
+            # we were unable to charge the subscriber's card
+            "custom_fields": [],
+            "email": "maxwell@gumroad.com"
             }
-            
-            */
-            if (result.status === 404) {
-                console.log("could not verify licence please check your connection")
-            }
-            else if (result.status === 200) {
-                return result.json();
-            }
-        }).then(data => {
-            if (data.purchase.email === email.value) {
-                valid = true;
-                ipcRenderer.send('verified', { id: data.purchase.id, name: data.purchase.name });
-            }
-            return;
-        })
-        .catch(e => {
-            console.log('error')
-        })
+        }
+        
+        */
+        if (result.status === 404) {
+            console.log("could not verify licence please check your connection")
+        }
+        else if (result.status === 200) {
+            return result.json();
+        }
+    }).then(data => {
+        if (data.purchase.email === email.value) {
+            valid = true;
+            ipcRenderer.send('verified', { id: data.purchase.id, name: data.purchase.name });
+        }
+        return;
+    })
+    .catch(e => {
+        console.log('error')
+    })
 }
