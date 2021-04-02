@@ -151,6 +151,7 @@ function createBrowserWindow() {
       contextIsolation: false,
     }
   })
+  browserWindow.webContents.openDevTools();
   browserWindow.loadFile('./static/index.html')
 }
 
