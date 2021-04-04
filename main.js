@@ -9,8 +9,8 @@ const Store = require("electron-store");
 const AutoLaunch = require("auto-launch");
 
 const autoLauncher = new AutoLaunch({
-  name: "Lapse",
-  path: '/Applications/lapse.app',
+  name: "Silentshot",
+  path: '/Applications/silentshot.app',
 });
 
 let store = new Store();
@@ -24,6 +24,7 @@ let settings = {
   defaultDir: `${homedir()}/Downloads`,
   savetoClipboard: true,
   saveToDevice: true,
+  autolaunch: true,
 }
 
 if (store.get('user-info')) {
@@ -69,68 +70,90 @@ function clickTray() {
     });
   }
   else {
-    screenshot().then(img => { 
-        clipboard.writeImage(img); 
+    screenshot().then(img => {
+      clipboard.writeImage(img);
     });
   }
 }
+
+function RighClickTray() {
+  // create context menu
+  const contextMenu = [{
+    label: "save options",
+    submenu: [{
+      accelerator: process.platform === 'darwin' ? 'Alt+Cmd+L' : 'Alt+Ctrl+L',
+      label: 'Save to folder',
+      type: "checkbox",
+      click: () => {
+        settings.saveToDevice = settings.saveToDevice ? false : true;
+        if (!settings.savetoClipboard) settings.savetoClipboard = true;
+        UpdateSettings(settings);
+      },
+      checked: settings.saveToDevice,
+    }, {
+      label: 'Copy to clipboard',
+      type: "checkbox",
+      click: () => {
+        if (!settings.saveToDevice) settings.saveToDevice = true;
+        settings.savetoClipboard = settings.savetoClipboard ? false : true;
+        UpdateSettings(settings);
+      },
+      checked: settings.savetoClipboard,
+    }],
+  },
+  {
+    label: "Image format",
+    submenu: [{
+      label: 'png',
+      type: "checkbox",
+      checked:settings.format === 'png',
+      click: () => {
+        settings.format = 'png';
+        UpdateSettings(settings);
+      }
+    }, {
+      label: 'jpg',
+      type: "checkbox",
+      checked:settings.format === 'jpg',
+      click: () => {
+        settings.format = 'jpg',
+          UpdateSettings(settings);
+      }
+    },]
+  }, {
+    label: "change default directory",
+    click: () => {
+      dialog.showOpenDialog({
+        properties: ['openDirectory']
+      }).then(filepath => {
+        settings.defaultDir = filepath.filePaths[0];
+        UpdateSettings(settings);
+      })
+    }
+  },
+  {
+    label: 'Autolaunch',
+    type: 'checkbox',
+    click: () => { settings.autolaunch = !settings.autolaunch; UpdateSettings(settings) },
+    checked: settings.autolaunch,
+  },
+  {
+    label: "About Silentshot",
+    click: () => { shell.openExternal('https://silentshot.achuth.dev') }
+  },
+  {
+    role: 'quit',
+    accelerator: process.platform === 'darwin' ? 'Alt+Shift+L' : 'Alt+Shift+L',
+  }]
+  const TrayMenu = Menu.buildFromTemplate(contextMenu);
+  _tray.popUpContextMenu(TrayMenu);
+}
 function createTray() {
-  const appIcon = join(__dirname, "static/light.png");
+  const appIcon = join(__dirname, "lightTemplate.png");
   _tray = new Tray(appIcon);
   _tray.setToolTip('SilentShot | click to capture');
   _tray.on('click', clickTray)
-  _tray.on('right-click', () => {
-    // create context menu
-    const contextMenu = [{
-      label: "save options",
-      submenu: [{
-        accelerator: process.platform === 'darwin' ? 'Alt+Cmd+L' : 'Alt+Ctrl+L',
-        label: 'Save to folder',
-        type: "checkbox",
-        click: () => {
-          settings.saveToDevice = settings.saveToDevice ? false : true;
-          if (!settings.savetoClipboard) settings.savetoClipboard = true;
-          UpdateSettings(settings);
-        },
-        checked: settings.saveToDevice,
-      }, {
-        label: 'Copy to clipboard',
-        type: "checkbox",
-        click: () => {
-          if(!settings.saveToDevice) settings.saveToDevice = true;
-          settings.savetoClipboard = settings.savetoClipboard ? false : true;
-          UpdateSettings(settings);
-        },
-        checked: settings.savetoClipboard,
-      }],
-    }, {
-      label: "change default directory",
-      click: () => {
-        dialog.showOpenDialog({
-          properties: ['openDirectory']
-        }).then(filepath => {
-          settings.defaultDir = filepath.filePaths[0];
-          UpdateSettings(settings);
-        })
-      }
-    },
-    {
-      label: 'Auto',
-      type: 'checkbox',
-      click: () => { settings.quality = 25; UpdateSettings(settings) },
-      checked: settings.quality === 25 ? true : false,
-    },
-    {
-      label: "About Silentshot",
-      click: () => { shell.openExternal('https://silentshot.achuth.dev') }
-    },
-    {
-      role: 'quit',
-      accelerator: process.platform === 'darwin' ? 'Alt+Shift+L' : 'Alt+Shift+L',
-    }]
-    const TrayMenu = Menu.buildFromTemplate(contextMenu);
-    _tray.popUpContextMenu(TrayMenu);
-  })
+  _tray.on('right-click', RighClickTray)
 }
 
 function createBrowserWindow() {
