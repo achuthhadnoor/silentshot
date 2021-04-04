@@ -3,7 +3,7 @@
 const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
-const { homedir } = require('os');
+const { homedir, tmpdir } = require('os');
 const { onFirstRunMaybe } = require("./first-run");
 const Store = require("electron-store");
 const AutoLaunch = require("auto-launch");
@@ -70,7 +70,9 @@ function clickTray() {
     });
   }
   else {
-    screenshot().then(img => {
+    let filename = `${tmpdir()}/capture${Date.now()}.${settings.format}`;
+    screenshot({format : settings.format, filename}).then(img => {
+      console.log("copied to clipboard");
       clipboard.writeImage(img);
     });
   }
