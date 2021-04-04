@@ -81,7 +81,7 @@ function clickTray() {
 function RighClickTray() {
   // create context menu
   const contextMenu = [{
-    label: "save options",
+    label: "Save options",
     submenu: [{
       accelerator: process.platform === 'darwin' ? 'Alt+Cmd+L' : 'Alt+Ctrl+L',
       label: 'Save to folder',
@@ -123,7 +123,7 @@ function RighClickTray() {
       }
     },]
   }, {
-    label: "change default directory",
+    label: "Change default directory",
     click: () => {
       dialog.showOpenDialog({
         properties: ['openDirectory']
