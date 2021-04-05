@@ -1,10 +1,9 @@
 'use strict'
 
-const { app, Tray, clipboard, Menu, dialog, shell, BrowserWindow, ipcMain, globalShortcut } = require("electron");
+const { app, Tray, clipboard, Menu, dialog, shell, ipcMain, globalShortcut } = require("electron");
 const { join } = require("path");
 const screenshot = require('screenshot-desktop')
 const { homedir, tmpdir } = require('os');
-const { onFirstRunMaybe } = require("./first-run");
 const Store = require("electron-store");
 const AutoLaunch = require("auto-launch");
 
@@ -71,7 +70,7 @@ function clickTray() {
   }
   else {
     let filename = `${tmpdir()}/capture${Date.now()}.${settings.format}`;
-    screenshot({format : settings.format, filename}).then(img => {
+    screenshot({ format: settings.format, filename }).then(img => {
       console.log("copied to clipboard");
       clipboard.writeImage(img);
     });
@@ -108,7 +107,7 @@ function RighClickTray() {
     submenu: [{
       label: 'png',
       type: "checkbox",
-      checked:settings.format === 'png',
+      checked: settings.format === 'png',
       click: () => {
         settings.format = 'png';
         UpdateSettings(settings);
@@ -116,7 +115,7 @@ function RighClickTray() {
     }, {
       label: 'jpg',
       type: "checkbox",
-      checked:settings.format === 'jpg',
+      checked: settings.format === 'jpg',
       click: () => {
         settings.format = 'jpg',
           UpdateSettings(settings);
@@ -158,44 +157,16 @@ function createTray() {
   _tray.on('right-click', RighClickTray)
 }
 
-function createBrowserWindow() {
-  browserWindow = new BrowserWindow({
-    icon: join('./static/icon.png'),
-    frame: false,
-    height: 300,
-    width: 300,
-    resizable: false,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    transparent: true,
-    maximizable: false,
-    minimizable: false,
-    hasShadow: false,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    }
-  })
-  browserWindow.loadFile('./static/index.html')
-}
 
 app.on('ready', async () => {
-  await onFirstRunMaybe();
-  if (!user.isVerified) {
-    createBrowserWindow();
-    return;
+  if (settings.autolaunch) {
+    autoLauncher.enable();
   }
-  if (user.isVerified) {
-    if (settings.autolaunch) {
-      autoLauncher.enable();
-    }
-    else {
-      autoLauncher.disable();
-    }
-    createTray();
-    createGlobalshortcuts();
-    return;
+  else {
+    autoLauncher.disable();
   }
+  createTray();
+  createGlobalshortcuts();
 })
 
 app.on('will-quit', () => {
